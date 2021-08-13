@@ -10,6 +10,8 @@ def sol():
 	dic = {}
 	n = int(input())
 	for i in range(0,n):
+		dic.clear()
+		# input reception
 		m = int(input())
 		for j in range(0,m):
 			x, y = list(input().split())
@@ -17,9 +19,12 @@ def sol():
 				dic[y].append(x)
 			else:
 				dic[y] = [x]
+		#print(dic)
+		# bino section
 		tally=1
-		for j in range(0)
-		print(tally)
+		for k in dic.keys():
+			tally *= len(dic[k]) + 1
+		print(tally - 1)
 	
 
 if __name__ == '__main__':
