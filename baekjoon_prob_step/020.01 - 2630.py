@@ -8,25 +8,24 @@ for i in range(0,n):
 def recur(row, col, leng):
 	if leng==1:
 		if arr[row][col]==1:
-			blue += 1
-			return
-		elif arr[row][col]==0:
-			white += 1
-			return
-	# check the chunk whether it's consisted with only 1s
-	fit_flag = True
-	for i in range(row, row+leng):
-		for j in range(col, col+leng):
-			if arr[i][j] != 1:
-				fit_flag=False
-				break
-		if fit_flag==False:
-			break
-	# do recursive job if it's not a fit square
-	# issue: add logics checking other chunks that devided
-	if fit_flag==False:
-		recur(row,col,leng//2)
-	elif fit_flag==True:
-		blue += 1
-		return
+			return 1
+		else:
+			return 0
+	a = recur(row, col, leng//2)
+	b = recur(row+leng//2, col, leng//2)
+	c = recur(row+leng//2, col+leng//2, leng//2)
+	d = recur(row,col+leng//2,leng//2)
+	if a+b+c+d == leng**2:
+		return 1
+	else:
+		blue += a+b+c+d
+		white += 4-(a+b+c+d)
+		return 0
 
+# main starts from here
+res = recur(0,0,n)
+if res==1:
+	white = 0
+	blue = 1
+print(blue)
+print(white)
