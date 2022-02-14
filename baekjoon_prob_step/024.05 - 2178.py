@@ -1,46 +1,26 @@
-import sys
 from collections import deque
 
-def bfs(n):
-    count = 0
-    visited[n] = True
-    queue = deque([n])
-    while len(queue) != 0:
-        v = queue.popleft()
-        count += 1
-        for i in graph[v]:
-            if not visited[i]:
-                queue.append(i)
-                visited[i] = True
-                if i == (m*n-1):
-                    return count
+n, m = map(int, input().split())
+graph = [list(map(int, input())) for _ in range(n)]
+count_graph = [[0] * m for _ in range(n)]
+visited = [[False] * m for _ in range(n)]
+queue = deque([[0,0]])
+visited[0][0] = True
+count_graph[0][0] = 1
+dy = [-1, 1, 0, 0]
+dx = [0, 0, -1, 1]
 
-n, m = list(map(int,input().split()))
+while len(queue) != 0:
+    y, x = queue.popleft()
+    if x == m and y == n:
+        break
+    for i in range(4):
+        nX = x + dx[i]
+        nY = y + dy[i]
 
-# maze initialize
-arr = [] # 1-indexed
-arr.append(['0' for _ in range(0, m + 2)])
-for i in range(0,n):
-    arr.append(['0'] + list(input()) + ['0'])
-arr.append(['0' for _ in range(0, m + 2)])
-
-# tree initialize
-graph = [[] for _ in range((n+1) * (m+1) + 1)] # 1-indexed
-visited = [False] * ((n+1) * (m+1) + 1) # 1-indexed
-
-for i in range(1,n+1):
-    for j in range(1, m+1):
-        if arr[i][j] == '1' and arr[i + 1][j] == '1':
-            graph[i * m + j].append((i+1) * m + j)
-            graph[(i+1) * m + j].append(i * m + j)
-        if arr[i][j] == '1' and arr[i - 1][j] == '1':
-            graph[i * m + j].append((i-1) * m + j)
-            graph[(i-1) * m + j].append(i * m + j)
-        if arr[i][j] == '1' and arr[i][j + 1] == '1':
-            graph[i * m + j].append(i * m + (j+1))
-            graph[i * m + (j+1)].append(i * m + j)
-        if arr[i][j] == '1' and arr[i][j - 1] == '1':
-            graph[i * m + j].append(i * m + (j-1))
-            graph[i * m + (j-1)].append(i * m + j)
-bfs(0)
-print(count)
+        if 0 <= nX < m and 0 <= nY < n:
+            if graph[nY][nX] == 1 and not visited[nY][nX]:
+                visited[nY][nX] = True
+                queue.append([nY, nX])
+                count_graph[nY][nX] += count_graph[y][x] + 1
+print(count_graph[n - 1][m - 1])
