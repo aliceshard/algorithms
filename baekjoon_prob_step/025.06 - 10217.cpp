@@ -3,49 +3,58 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <stack>
+#include <utility>
 #define INF 0xFFFFFF
 using namespace std;
 
+class compare {
+public:
+	bool operator()(const vector<int> e1, const vector<int> e2) {
+		// compare d
+		return e1[2] > e2[2];
+	}
+};
+
 int n, m, k, T = 0;
-vector<int> memo;
+int memo[101][10001];
 vector<vector<vector<int>>> graph;
-priority_queue<vector<int>, vector<vector<int>>, less<vector<int>>> pq;
-
-
-bool operator<(vector<int> e1, vector<int> e2) {
-	// compare d
-	return e1[2] < e2[2];
-}
+priority_queue<vector<int>, vector<vector<int>>, compare> pq;
 
 void dijkstra(int start) {
-	// memo init
-	for (int i = 0; i < n + 1; i++)
-		memo.push_back(INF);
-
 	vector<int> tp_start = { 1, 0, 0 };
 	pq.push(tp_start);
-	memo[start] = 0;
+
 	while (pq.size() != 0) {
 		vector<int> temp = pq.top();
 		pq.pop();
 		int now = temp[0];
-		int cost = temp[1];
+		int fee = temp[1];
 		int dist = temp[2];
 
-		if (memo[now] < dist)
+		// prevent loop
+		if (memo[now][fee] < dist)
 			continue;
 
 		for (int i = 0; i < graph[now].size(); i++) {
 			vector<int> graph_ptr = graph[now][i];
 			int dest = graph_ptr[0];
+			int fee_next = graph_ptr[1];
 			int adj_dist = graph_ptr[2];
 
-			int cost = dist + adj_dist;
-			if (cost < memo[dest]) {
-				memo[dest] = cost;
-				vector<int> tp = { dest, 0, cost };
-				pq.push(tp);
+			int total_dist = dist + adj_dist;
+			int total_fee = fee + fee_next;
+			
+			if (total_fee > m)
+				continue;
+			if (memo[dest][total_fee] <= total_dist)
+				continue;
+			
+			for (int j = total_fee; j <= m; j++) {
+				if (memo[dest][j] > total_dist)
+					memo[dest][j] = total_dist;
 			}
+			pq.push({ dest, total_fee, total_dist });
 		}
 	}
 }
@@ -53,13 +62,18 @@ void dijkstra(int start) {
 int main(void) {
 	cin >> T;
 	for (int i = 0; i < T; i++) {
+		int ans = INF;
 		cin >> n >> m >> k;
 
-		// init. graph vector
+		// init. 
+		graph.clear();
 		for (int j = 0; j < n + 1; j++) {
 			vector<vector<int>> tp1 = {};
 			graph.push_back(tp1);
 		}
+		for (int j = 0; j < 101; j++) 
+			for (int l = 0; l < 10001; l++) 
+				memo[j][l] = INF;
 
 		// store graph inputs
 		for (int j = 0; j < k; j++) {
@@ -70,7 +84,17 @@ int main(void) {
 		}
 
 		dijkstra(1);
-		printf("%d\n", memo[n]);
+
+		for (int j = 0; j <= m; j++) {
+			ans = min(ans, memo[n][j]);
+		}
+
+		if (ans == INF) {
+			printf("Poor KCM\n");
+		}
+		else {
+			printf("%d\n", ans);
+		}
 	}
 
 	return 0;
